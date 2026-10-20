@@ -56,6 +56,10 @@ function getPlanClass(plan) {
     return `plan-${plan}`;
 }
 
+// DOM elements for error state
+let profileCard = null;
+let errorState = null;
+
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem('polen_token');
     const user = localStorage.getItem('polen_user');
@@ -64,6 +68,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.location.href = '/';
         return;
     }
+
+    // Cache DOM elements
+    profileCard = document.querySelector('.profile-card');
+    errorState = document.getElementById('errorState');
 
     // Setup logout
     document.getElementById('logoutBtn').addEventListener('click', () => {
@@ -101,26 +109,53 @@ document.addEventListener('DOMContentLoaded', async () => {
             alert('Error al exportar datos');
         }
     });
+
+    // Retry button
+    const retryBtn = document.getElementById('retryBtn');
+    if (retryBtn) {
+        retryBtn.addEventListener('click', () => {
+            showLoading();
+            loadProfile();
+        });
+    }
+
+    // Check admin status for nav
+    await checkAdminStatus();
 });
 
-async function loadProfile() {
-    try {
-        const res = await fetch('/api/profile', { headers: authHeaders() });
-        if (res.status === 401) return forceLogout();
-
-        const data = await res.json();
-        if (!data.success) throw new Error(data.error || 'Error al cargar perfil');
-
-        const p = data.profile;
-        renderProfile(p);
-    } catch (err) {
-        console.error('Error loading profile:', err);
-        document.getElementById('profileName').textContent = 'Error al cargar';
-    }
+function showLoading() {
+    if (profileCard) profileCard.style.display = 'none';
+    if (errorState) errorState.style.display = 'none';
+    document.getElementById('profileName').textContent = 'Cargando...';
+    document.getElementById('profileEmail').textContent = '';
+    document.getElementById('profilePlan').textContent = '';
+    document.getElementById('profilePlan').className = 'plan-badge';
+    // Reset stats
+    ['statConversations', 'statMessages', 'statTokens', 'statRecent'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = '...';
+    });
+    ['infoEmail', 'infoName', 'infoPlan', 'infoCreated', 'infoLastActive'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = '...';
+    });
+    if (errorState) errorState.style.display = 'none';
+    if (profileCard) profileCard.style.display = 'block';
 }
 
-function renderProfile(p) {
-    // Header
+function showError(message) {
+    if (profileCard) profileCard.style.display = 'none';
+    if (errorState) {
+        errorState.style.display = 'block';
+        const errorMsg = errorState.querySelector('.error-message');
+        if (errorMsg) errorMsg.textContent = message;
+    }
+    document.getElementById('profileName').textContent = 'Error al cargar';
+}
+
+function showProfile(p) {
+    if (errorState) errorState.style.display = 'none';
+    if (profileCard) profileCard.style.display = 'block';
     document.getElementById('profileName').textContent = p.display_name || p.email.split('@')[0];
     document.getElementById('profileEmail').textContent = p.email;
     document.getElementById('profilePlan').textContent = getPlanLabel(p.plan);
@@ -138,4 +173,40 @@ function renderProfile(p) {
     document.getElementById('infoPlan').textContent = getPlanLabel(p.plan);
     document.getElementById('infoCreated').textContent = formatDate(p.created_at);
     document.getElementById('infoLastActive').textContent = formatRelativeTime(p.last_active_at);
+}
+
+async function loadProfile() {
+    showLoading();
+    try {
+        const res = await fetch('/api/profile', { headers: authHeaders() });
+        if (res.status === 401) return forceLogout();
+
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error || 'Error al cargar perfil');
+
+        const p = data.profile;
+        showProfile(p);
+    } catch (err) {
+        console.error('Error loading profile:', err);
+        showError(err.message || 'Error al cargar el perfil. Verifica tu conexión e inténtalo de nuevo.');
+    }
+}
+
+async function checkAdminStatus() {
+    const token = localStorage.getItem('polen_token');
+    if (!token) return;
+
+    try {
+        const res = await fetch('/api/profile', {
+            headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data.success && data.profile.is_admin) {
+                document.getElementById('navAdmin').style.display = 'flex';
+            }
+        }
+    } catch (err) {
+        console.error('Admin check failed:', err);
+    }
 }

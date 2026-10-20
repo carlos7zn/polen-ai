@@ -84,6 +84,23 @@
             </header>
 
             <div class="messages-container" id="messagesContainer" style="padding: 32px; max-width: 768px; margin: 0 auto;">
+                <!-- Error State -->
+                <div id="errorState" class="error-state" style="display: none;">
+                    <div class="error-card">
+                        <div class="error-icon">⚠️</div>
+                        <h3>Error al cargar el perfil</h3>
+                        <p class="error-message"></p>
+                        <button class="btn-primary" id="retryBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M23 4v6h-6"></path>
+                                <path d="M1 20v-6h6"></path>
+                                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"></path>
+                            </svg>
+                            Reintentar
+                        </button>
+                    </div>
+                </div>
+
                 <div class="profile-card">
                     <div class="profile-header">
                         <div class="profile-avatar">
@@ -98,19 +115,19 @@
 
                     <div class="stats-grid">
                         <div class="stat-card">
-                            <div class="stat-value" id="statConversations">0</div>
+                            <div class="stat-value" id="statConversations">...</div>
                             <div class="stat-label">Conversaciones</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-value" id="statMessages">0</div>
+                            <div class="stat-value" id="statMessages">...</div>
                             <div class="stat-label">Mensajes totales</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-value" id="statTokens">0</div>
+                            <div class="stat-value" id="statTokens">...</div>
                             <div class="stat-label">Tokens usados</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-value" id="statRecent">0</div>
+                            <div class="stat-value" id="statRecent">...</div>
                             <div class="stat-label">Mensajes (7 días)</div>
                         </div>
                     </div>
@@ -120,23 +137,23 @@
                         <div class="info-grid">
                             <div class="info-item">
                                 <label>Email</label>
-                                <span id="infoEmail">-</span>
+                                <span id="infoEmail">...</span>
                             </div>
                             <div class="info-item">
                                 <label>Nombre</label>
-                                <span id="infoName">-</span>
+                                <span id="infoName">...</span>
                             </div>
                             <div class="info-item">
                                 <label>Plan</label>
-                                <span id="infoPlan">-</span>
+                                <span id="infoPlan">...</span>
                             </div>
                             <div class="info-item">
                                 <label>Miembro desde</label>
-                                <span id="infoCreated">-</span>
+                                <span id="infoCreated">...</span>
                             </div>
                             <div class="info-item">
                                 <label>Última actividad</label>
-                                <span id="infoLastActive">-</span>
+                                <span id="infoLastActive">...</span>
                             </div>
                         </div>
                     </div>
