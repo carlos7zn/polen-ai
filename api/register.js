@@ -48,8 +48,11 @@ export default async function handler(req, res) {
         const supabaseData = await supabaseRes.json();
 
         if (!supabaseRes.ok) {
-            const msg = supabaseData.message || supabaseData.details || 'Error al registrar';
-            return res.status(400).json({ error: msg });
+            console.error('Supabase register error:', supabaseRes.status, supabaseData);
+            return res.status(supabaseRes.status).json({
+                error: supabaseData.message || supabaseData.details || supabaseData.hint || 'Error al registrar en base de datos',
+                details: supabaseData
+            });
         }
 
         const user = supabaseData[0];
@@ -66,6 +69,6 @@ export default async function handler(req, res) {
         });
     } catch (err) {
         console.error('Register error:', err);
-        return res.status(500).json({ error: 'Error del servidor' });
+        return res.status(500).json({ error: 'Error del servidor: ' + err.message });
     }
 }
