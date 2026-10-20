@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PolenAI - Mi Perfil</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">🐝</div>
+                    <span class="logo-text">PolenAI</span>
+                </div>
+            </div>
+
+            <button class="new-chat-btn" id="newChatBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Nueva conversación
+            </button>
+
+            <!-- Navigation links -->
+            <nav class="sidebar-nav">
+                <a href="/chat.html" class="nav-link" id="navChat">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Chat
+                </a>
+                <a href="/profile.html" class="nav-link active" id="navProfile">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    Mi Perfil
+                </a>
+                <a href="/admin.html" class="nav-link" id="navAdmin" style="display: none;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2"></rect>
+                        <path d="M8 21h8"></path>
+                        <path d="M12 17v4"></path>
+                    </svg>
+                    Admin
+                </a>
+            </nav>
+
+            <button class="new-chat-btn" id="newChatBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Nueva conversación
+            </button>
+
+            <div class="conversations-list" id="conversationsList"></div>
+
+            <div class="sidebar-footer">
+                <button class="logout-btn" id="logoutBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    Cerrar Sesión
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Profile -->
+        <main class="chat-main">
+            <header class="chat-header">
+                <div class="chat-header-info">
+                    <h2 id="currentTitle">Mi Perfil</h2>
+                </div>
+            </header>
+
+            <div class="messages-container" id="messagesContainer" style="padding: 32px; max-width: 768px; margin: 0 auto;">
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            <span id="profileAvatar">🐝</span>
+                        </div>
+                        <div class="profile-info">
+                            <h2 id="profileName">Cargando...</h2>
+                            <p id="profileEmail" class="profile-email"></p>
+                            <span id="profilePlan" class="plan-badge">Free</span>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="statConversations">0</div>
+                            <div class="stat-label">Conversaciones</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statMessages">0</div>
+                            <div class="stat-label">Mensajes totales</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statTokens">0</div>
+                            <div class="stat-label">Tokens usados</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="statRecent">0</div>
+                            <div class="stat-label">Mensajes (7 días)</div>
+                        </div>
+                    </div>
+
+                    <div class="profile-section">
+                        <h3>Información de la cuenta</h3>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Email</label>
+                                <span id="infoEmail">-</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Nombre</label>
+                                <span id="infoName">-</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Plan</label>
+                                <span id="infoPlan">-</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Miembro desde</label>
+                                <span id="infoCreated">-</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Última actividad</label>
+                                <span id="infoLastActive">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="profile-section">
+                        <h3>Acciones</h3>
+                        <div class="actions-grid">
+                            <button class="btn-secondary" id="btnUpgradePlan">Actualizar plan</button>
+                            <button class="btn-secondary" id="btnExportData">Exportar datos</button>
+                            <a href="/chat.html" class="btn-secondary">Volver al chat</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/js/profile.js"></script>
+    <script>
+        // Show/hide admin nav link based on admin status
+        async function checkAdminStatus() {
+            const token = localStorage.getItem('polen_token');
+            if (!token) return;
+            
+            try {
+                const res = await fetch('/api/profile', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.success && data.profile.is_admin) {
+                        document.getElementById('navAdmin').style.display = 'flex';
+                    }
+                }
+            } catch (err) {
+                console.error('Admin check failed:', err);
+            }
+        }
+        
+        // Run after DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', checkAdminStatus);
+        } else {
+            checkAdminStatus();
+        }
+    </script>
+    <script src="/js/profile.js"></script>
+</body>
+</html>

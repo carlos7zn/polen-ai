@@ -28,6 +28,39 @@
                 Nueva conversación
             </button>
 
+            <!-- Navigation links -->
+            <nav class="sidebar-nav">
+                <a href="/chat.html" class="nav-link active" id="navChat">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    Chat
+                </a>
+                <a href="/profile.html" class="nav-link" id="navProfile">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    Mi Perfil
+                </a>
+                <a href="/admin.html" class="nav-link" id="navAdmin" style="display: none;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2"></rect>
+                        <path d="M8 21h8"></path>
+                        <path d="M12 17v4"></path>
+                    </svg>
+                    Admin
+                </a>
+            </nav>
+
+            <button class="new-chat-btn" id="newChatBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Nueva conversación
+            </button>
+
             <div class="conversations-list" id="conversationsList">
                 <!-- Conversations loaded dynamically -->
             </div>
@@ -81,6 +114,35 @@
         </main>
     </div>
 
+    <script src="/js/chat.js"></script>
+    <script>
+        // Show/hide admin nav link based on admin status
+        async function checkAdminStatus() {
+            const token = localStorage.getItem('polen_token');
+            if (!token) return;
+            
+            try {
+                const res = await fetch('/api/profile', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.success && data.profile.is_admin) {
+                        document.getElementById('navAdmin').style.display = 'flex';
+                    }
+                }
+            } catch (err) {
+                console.error('Admin check failed:', err);
+            }
+        }
+        
+        // Run after DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', checkAdminStatus);
+        } else {
+            checkAdminStatus();
+        }
+    </script>
     <script src="/js/chat.js"></script>
 </body>
 </html>

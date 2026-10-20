@@ -5,6 +5,11 @@ CREATE TABLE IF NOT EXISTS users (
     email TEXT UNIQUE NOT NULL,
     password_hash TEXT NOT NULL,
     display_name TEXT,
+    plan TEXT DEFAULT 'free',           -- free, pro, premium
+    message_count INTEGER DEFAULT 0,    -- total mensajes enviados
+    token_count BIGINT DEFAULT 0,       -- tokens totales usados
+    is_admin BOOLEAN DEFAULT false,     -- acceso a panel admin
+    last_active_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
