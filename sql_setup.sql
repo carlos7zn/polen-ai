@@ -1,5 +1,5 @@
+-- PolenAI - esquema de base de datos (ejecutar en Supabase -> SQL Editor)
 
--- Tabla de usuarios
 CREATE TABLE IF NOT EXISTS users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     email TEXT UNIQUE NOT NULL,
@@ -8,7 +8,6 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMPTZ DEFAULT now()
 );
 
--- Tabla de conversaciones
 CREATE TABLE IF NOT EXISTS conversations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -18,21 +17,23 @@ CREATE TABLE IF NOT EXISTS conversations (
     updated_at TIMESTAMPTZ DEFAULT now()
 );
 
--- Índice para búsquedas rápidas
 CREATE INDEX IF NOT EXISTS idx_conversations_user_id ON conversations(user_id);
 
--- Función para actualizar updated_at automáticamente
 CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$ 
-BEGIN 
+RETURNS TRIGGER AS $$
+BEGIN
     NEW.updated_at = now();
     RETURN NEW;
 END;
-$$ language 'plpgsql';
+$$ LANGUAGE plpgsql;
 
--- Trigger en conversations
 DROP TRIGGER IF EXISTS update_conversations_updated_at ON conversations;
-CREATE TRIGGER update_conversations_updated_at 
-    BEFORE UPDATE ON conversations 
-    FOR EACH ROW 
+CREATE TRIGGER update_conversations_updated_at
+    BEFORE UPDATE ON conversations
+    FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
+
+-- SEGURIDAD: activar RLS SIN politicas = la clave publica (anon) no puede leer ni escribir nada.
+-- El servidor accede con la clave service_role, que se salta RLS.
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE conversations ENABLE ROW LEVEL SECURITY;

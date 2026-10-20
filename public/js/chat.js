@@ -4,6 +4,16 @@ let currentConvId = null;
 let conversations = [];
 let isStreaming = false;
 
+function authHeaders(extra = {}) {
+    return { 'Authorization': 'Bearer ' + localStorage.getItem('polen_token'), ...extra };
+}
+
+function forceLogout() {
+    localStorage.removeItem('polen_token');
+    localStorage.removeItem('polen_user');
+    window.location.href = '/';
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     const user = localStorage.getItem('polen_user');
     if (!user) {
@@ -26,11 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function setupLogout() {
     document.getElementById('logoutBtn').addEventListener('click', () => {
-        if (confirm('¿Estás seguro de cerrar sesión?')) {
-            localStorage.removeItem('polen_token');
-            localStorage.removeItem('polen_user');
-            window.location.href = '/';
-        }
+        if (confirm('¿Estás seguro de cerrar sesión?')) forceLogout();
     });
 }
 
@@ -55,19 +61,18 @@ function setupNewChat() {
 }
 
 function setupSuggestionChips() {
-    document.querySelectorAll('.chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-            document.getElementById('messageInput').value = chip.dataset.prompt;
-            document.getElementById('chatForm').dispatchEvent(new Event('submit'));
-        });
+    document.getElementById('messagesContainer').addEventListener('click', (e) => {
+        const chip = e.target.closest('.chip');
+        if (!chip) return;
+        document.getElementById('messageInput').value = chip.dataset.prompt;
+        document.getElementById('chatForm').requestSubmit();
     });
 }
 
 async function loadConversations() {
     try {
-        const res = await fetch('/api/conversations', {
-            headers: {'Authorization': 'Bearer ' + localStorage.getItem('polen_token')}
-        });
+        const res = await fetch('/api/conversations', { headers: authHeaders() });
+        if (res.status === 401) return forceLogout();
         const data = await res.json();
         if (data.success) {
             conversations = data.conversations || [];
@@ -110,19 +115,23 @@ function escapeHtml(text) {
 }
 
 async function loadConversation(convId) {
-    currentConvId = convId;
-    const conv = conversations.find(c => c.id === convId);
-    if (!conv) return;
+    if (isStreaming) return;
+    try {
+        const res = await fetch('/api/conversations?id=' + encodeURIComponent(convId), { headers: authHeaders() });
+        if (res.status === 401) return forceLogout();
+        const data = await res.json();
+        if (!data.success) return;
 
-    document.getElementById('currentTitle').textContent = conv.title;
-    renderSidebar();
+        currentConvId = convId;
+        document.getElementById('currentTitle').textContent = data.conversation.title;
+        renderSidebar();
 
-    const container = document.getElementById('messagesContainer');
-    container.innerHTML = '';
-    
-    conv.messages.forEach(msg => {
-        addMessage(msg.role, msg.content);
-    });
+        const container = document.getElementById('messagesContainer');
+        container.innerHTML = '';
+        (data.conversation.messages || []).forEach(msg => addMessage(msg.role, msg.content));
+    } catch (err) {
+        console.error('Error loading conversation:', err);
+    }
 }
 
 function setupChat() {
@@ -145,21 +154,18 @@ function setupChat() {
         let fullText = '';
 
         try {
-            const token = localStorage.getItem('polen_token');
             const res = await fetch('/api/chat', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                },
+                headers: authHeaders({ 'Content-Type': 'application/json' }),
                 body: JSON.stringify({
                     conversationId: currentConvId,
                     message: message
                 })
             });
 
+            if (res.status === 401) return forceLogout();
             if (!res.ok) {
-                const errData = await res.json();
+                const errData = await res.json().catch(() => ({}));
                 contentEl.textContent = errData.error || 'Error';
                 isStreaming = false;
                 sendBtn.disabled = false;
@@ -185,6 +191,9 @@ function setupChat() {
                         if (data === '[DONE]') break;
                         try {
                             const parsed = JSON.parse(data);
+                            if (parsed.error) {
+                                contentEl.textContent = fullText + '\n[' + parsed.error + ']';
+                            }
                             if (parsed.content) {
                                 fullText += parsed.content;
                                 contentEl.textContent = fullText;

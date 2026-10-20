@@ -61,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = document.getElementById('registerEmail').value;
         const password = document.getElementById('registerPassword').value;
         const name = document.getElementById('registerName').value;
+        const inviteCode = document.getElementById('registerInvite').value.trim();
         const errorEl = document.getElementById('registerError');
         const submitBtn = e.target.querySelector('button[type="submit"]');
         
@@ -68,8 +69,8 @@ document.addEventListener('DOMContentLoaded', () => {
         errorEl.style.display = 'none';
         
         // Validation
-        if (password.length < 6) {
-            errorEl.textContent = 'La contraseña debe tener al menos 6 caracteres';
+        if (password.length < 8) {
+            errorEl.textContent = 'La contraseña debe tener al menos 8 caracteres';
             errorEl.style.display = 'block';
             return;
         }
@@ -82,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch('/api/register', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({email, password, display_name: name})
+                body: JSON.stringify({email, password, display_name: name, invite_code: inviteCode})
             });
             const data = await res.json();
             
