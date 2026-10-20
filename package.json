@@ -1,1 +1,13 @@
-{"name":"polen-ai","version":"1.0.0","description":"PolenAI - Chatbot with restricted access","main":"api/register.js","scripts":{"start":"vercel dev"}}
+{
+  "name": "polen-ai",
+  "version": "1.0.0",
+  "description": "PolenAI - Chatbot with restricted access",
+  "main": "api/register.js",
+  "scripts": {
+    "build": "echo 'Static site - no build needed'",
+    "dev": "echo 'Run with vercel dev locally'"
+  },
+  "dependencies": {
+    "node-fetch": "^2.7.0"
+  }
+}
